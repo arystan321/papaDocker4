@@ -8,6 +8,7 @@
 
 <div class="form-container">
     <form action="{{ url_for('database.createFact') }}" method="POST">
+        {{ csrf_token() }}
         <div>
             <h1 style="display: inline;">{{ _words['create_a_new'].replace('*', _words['fact'].title()) }}</h1>
             <a href="{{ url_for('web.howTo') }}#how_to_fact" title="{{ _words['how_to_create'].replace('*', _words['fact']) }}" style="display: inline-block; color: black!important;"><h4><i class="fa-solid fa-circle-question"></i></h4></a>
