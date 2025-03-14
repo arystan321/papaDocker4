@@ -57,6 +57,7 @@
 
             <hr>
 
+            {% if patreon %}
             {% if patreon.get('data', None) %}
             <div class="card shadow-lg text-center" style="width: 24rem;">
                 <img src="{{ patreon['data']['attributes']['thumb_url'] }}"
@@ -80,6 +81,7 @@
                             <i class="fa-brands fa-patreon me-2"></i>Patreon
                         </a>
                     </div>
+            {% endif %}
             {% endif %}
 
             <hr>
