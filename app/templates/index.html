@@ -21,13 +21,10 @@
             integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
             crossorigin="anonymous"></script>
 
-    <style>
+    <style nonce="{{ _nonce }}">
         :root {
             --bs-primary: {{ _primary_color }} !important;
-            --bs-primary-rgb:
-                {{ (_primary_color[1:] | int(base=16) // 65536) }},
-                {{ ((_primary_color[1:] | int(base=16) // 256) % 256) }},
-                {{ (_primary_color[1:] | int(base=16) % 256) }} !important;
+            --bs-primary-rgb:{{ (_primary_color[1:] | int(base=16) // 65536) }}, {{ ((_primary_color[1:] | int(base=16) // 256) % 256) }}, {{ (_primary_color[1:] | int(base=16) % 256) }} !important;
 
             --bs-link-color-rgb: {{ _primary_color }} !important;
             --bs-gray-100: color-mix(in srgb, {{_primary_color}} 5%, var(--bs-white)) !important;
