@@ -32,7 +32,7 @@ class AuthenticationController(Singleton):
                 session.modified = True
 
                 response = make_response(redirect(url_for('authentication.profile')))
-                response.set_cookie('access_token', token, httponly=False, secure=True, samesite='Lax')
+                response.set_cookie('access_token', token, httponly=True, secure=True, samesite='Lax')
                 return response
         session['source_redirect'] = source_redirect
         return redirect(AuthenticationController.service.redirect_login())
@@ -49,13 +49,13 @@ class AuthenticationController(Singleton):
             request.args.get('code'), request.args.get('session_state'))
         session['access_token'] = token
         response = make_response(redirect(session.get('source_redirect')))
-        response.set_cookie('access_token', token, httponly=True, secure=True)
-        response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True)
+        response.set_cookie('access_token', token, httponly=True, secure=True, samesite='Lax')
+        response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite='Lax')
 
         authentication = AuthenticationController.service.get_roles(token)
         facts, labels, prefer_type = AuthenticationController.get_user_summary(authentication.get('sub'))
-        response.set_cookie('primary_color', prefer_type.get('color', ''), httponly=True, secure=True)
-        response.set_cookie('username', authentication.get('username'), httponly=True, secure=True)
+        response.set_cookie('primary_color', prefer_type.get('color', ''), httponly=True, secure=True, samesite='Lax')
+        response.set_cookie('username', authentication.get('username'), httponly=True, secure=True, samesite='Lax')
 
         return response
 
@@ -76,10 +76,10 @@ class AuthenticationController(Singleton):
             referrer = f"{referrer}/{authentication.get('username', '')}"
 
         response = make_response(redirect(referrer))
-        response.set_cookie('access_token', '', expires=0, httponly=True, secure=True)
-        response.set_cookie('primary_color', '', expires=0, httponly=True, secure=True)
-        response.set_cookie('username', '', expires=0, httponly=True, secure=True)
-        response.set_cookie('session', '', expires=0, httponly=True, secure=True)
+        response.set_cookie('access_token', '', expires=0, httponly=True, secure=True, samesite='Lax')
+        response.set_cookie('primary_color', '', expires=0, httponly=True, secure=True, samesite='Lax')
+        response.set_cookie('username', '', expires=0, httponly=True, secure=True, samesite='Lax')
+        response.set_cookie('session', '', expires=0, httponly=True, secure=True, samesite='Lax')
 
         return response
 
@@ -139,7 +139,7 @@ class AuthenticationController(Singleton):
                                                prefer_type=prefer_type,
                                                redirect_manage_profile=AuthenticationController.service.redirect_profile_manage(),
                                                 patreon=patreon))
-        response.set_cookie('primary_color', prefer_type.get('color', None), httponly=True, secure=True)
+        response.set_cookie('primary_color', prefer_type.get('color', None), httponly=True, secure=True, samesite='Lax')
         return response
 
     @staticmethod

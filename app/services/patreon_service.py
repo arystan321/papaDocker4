@@ -140,7 +140,7 @@ class PatreonService(IDonationService, IAuthenticationRoute):
             token_data = token_response.json()
             token = token_data.get('access_token')
             response = make_response(redirect(url_for(f'{self.blueprint_name}.profile')))
-            response.set_cookie('patreon_access_token', token, httponly=True, secure=True)
+            response.set_cookie('patreon_access_token', token, httponly=True, secure=True, samesite='Lax')
             return response
 
         return 'Failed to retrieve authorization code'
