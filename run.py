@@ -2,11 +2,16 @@ import os
 from datetime import datetime
 
 from flask import request, g
+from flask_cors import CORS
+from flask_wtf import CSRFProtect
 
 from app import create_app, AUTHENTICATED_ROLE
 from app.language import words
 
 app = create_app()
+app.config["SECRET_KEY"] = os.getenv('SECRET')
+CORS(app, origins=[os.getenv('CORS_WEB')])
+csrf = CSRFProtect(app)
 
 
 @app.template_filter('datetime_format')
