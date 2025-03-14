@@ -31,13 +31,13 @@ def create_app():
                                                 os.getenv('REALM'),
                                                 os.getenv('CLIENT_ID'),
                                                 os.getenv('CLIENT_SECRET'),
-                                                quote("http://localhost:5000/callback", safe=''),
+                                                quote(os.getenv('HOST_CALLBACK'), safe=''),
                                                 os.getenv('KEYCLOAK_ADMIN_SECRET'))
     app.register_blueprint(AuthenticationController.blueprint)
 
     from app.services.mongo import Mongo
     from app.controllers.database_controller import DatabaseController
-    DatabaseController.service = Mongo('Factee', 'mongodb://localhost:27017/')
+    DatabaseController.service = Mongo(os.getenv('MONGO_DB'), os.getenv('MONGO_URI'))
     app.register_blueprint(DatabaseController.blueprint)
 
     from app.controllers.image_controller import ImageController
