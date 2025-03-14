@@ -17,7 +17,7 @@ def Authenticated(required_roles: list[str], is_necessary=True):
 
             if is_necessary:
                 if not token:
-                    return redirect(url_for('authentication.login', source_redirect=request.path))
+                    return redirect(url_for('authentication.login', source_redirect=request.path or '/'))
 
             authentication: dict = service.get_roles(token)
 
