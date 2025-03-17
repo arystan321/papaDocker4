@@ -30,7 +30,7 @@ class KeyCloak(AuthenticationService):
             'Content-Type': 'application/x-www-form-urlencoded'
         }
 
-        response = requests.post(token_url, data=data, headers=headers)
+        response = requests.post(token_url, data=data, headers=headers, verify=False)
 
         if response.status_code == 200:
             return response.json()['access_token']
@@ -49,7 +49,7 @@ class KeyCloak(AuthenticationService):
             'password': password,
             'grant_type': 'password',
             'scope': 'openid'
-        })
+        }, verify=False)
 
         if response.status_code == 200:
             return response.json()['access_token'], "", 0
@@ -61,7 +61,7 @@ class KeyCloak(AuthenticationService):
             'client_id': self.CLIENT_ID,
             'client_secret': self.CLIENT_SECRET,
             'refresh_token': refresh_token
-        })
+        }, verify=False)
         if response.status_code == 204:
             return "Logout successful", 0
         return response.text, response.status_code
@@ -78,7 +78,7 @@ class KeyCloak(AuthenticationService):
             'redirect_uri': redirect_uri
         }
 
-        response = requests.post(token_url, data=data)
+        response = requests.post(token_url, data=data, verify=False)
         token = response.json().get('access_token', '')
         refresh_token = response.json().get('refresh_token', '')
         return token, refresh_token
@@ -97,7 +97,7 @@ class KeyCloak(AuthenticationService):
             'Content-Type': 'application/x-www-form-urlencoded'
         }
 
-        response = requests.get(user_info_url, headers=headers)
+        response = requests.get(user_info_url, headers=headers, verify=False)
 
         return "", response.text, response.status_code
 
@@ -110,7 +110,7 @@ class KeyCloak(AuthenticationService):
             'client_secret': self.CLIENT_SECRET
         }
 
-        response = requests.post(token_introspect_url, data=data)
+        response = requests.post(token_introspect_url, data=data, verify=False)
 
         return response.json()
 
@@ -122,7 +122,7 @@ class KeyCloak(AuthenticationService):
             'Content-Type': 'application/json'
         }
 
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, verify=False)
         user_data = response.json()
         return {
             "id": user_data.get("id"),
@@ -141,7 +141,7 @@ class KeyCloak(AuthenticationService):
             'Authorization': f'Bearer {self.ADMIN_TOKEN}',
             'Content-Type': 'application/json'
         }
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, verify=False)
         return response.json()
 
     def redirect_profile_manage(self) -> str:
