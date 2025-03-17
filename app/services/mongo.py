@@ -106,8 +106,23 @@ class Mongo(DatabaseService):
         return list(collection.aggregate(pipeline))
 
     def get_document(self, collection: str, query: dict) -> dict:
+        for key in query:
+            if "id" in key.lower() and isinstance(query[key], str):  # Check if key contains "id" and value is a string
+                try:
+                    query[key] = ObjectId(query[key])  # Convert to ObjectId
+                except Exception:
+                    pass
         collection = self.db[collection]
         return collection.find_one(query)
+
+    def delete_document(self, collection: str, query: dict):
+        for key in query:
+            if "id" in key.lower() and isinstance(query[key], str):  # Check if key contains "id" and value is a string
+                try:
+                    query[key] = ObjectId(query[key])  # Convert to ObjectId
+                except Exception:
+                    pass
+        self.db[collection].delete_one(query)
 
     def count_documents(self, collection: str, query: dict) -> int:
         collection = self.db[collection]
