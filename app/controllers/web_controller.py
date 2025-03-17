@@ -163,7 +163,7 @@ def factsView(authentication: dict = None):
         if fact:
             labels = DatabaseController.service.get_documents('labels', {})
             user = AuthenticationController.service.get_public_info(fact.get('user_id'))
-            if not user.username:
+            if not user.get('username', None):
                 user = deleted_user
             sorted_labels = sorted(labels, key=lambda x: x.get("order", 0))
             source = DatabaseController.service.get_document('sources', {'_id': ObjectId(fact.get('source_id'))})
@@ -192,7 +192,7 @@ def factsView(authentication: dict = None):
 
         for fact in facts:
             user = AuthenticationController.service.get_public_info(fact.get('user_id'))
-            if not user.username:
+            if not user.get('username', None):
                 fact['user'] = deleted_user
             else:
                 fact['user'] = user
