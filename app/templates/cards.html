@@ -104,6 +104,7 @@
 
         <div class="sort-options d-flex align-items-center">
             <span class="me-2">{{ _words['sort_by'] }}:</span>
+            {% set labels_name = [_words['title'], _words['created_at']] %}
             {% set labels_ = [] %}
             {% set label_icons = [] %}
             {% set label_colors = [] %}
@@ -112,7 +113,7 @@
                 {% set _ = label_icons.append(item.get('icon', None)) %}
                 {% set _ = label_colors.append(item.get('color', None)) %}
             {% endfor %}
-            {% for field in [_words['title'], _words['created_at']] + labels_ %}
+            {% for field in ['title', 'created_at'] + labels_ %}
                 {% set current_sort = request.args.get('sort', 'created_at') %}
                 {% set current_order = request.args.get('sort_order', 'desc') %}
                 {% set new_order = 'asc' if current_sort == field and current_order == 'desc' else 'desc' %}
@@ -123,7 +124,7 @@
                        {% if current_sort == field and current_order == 'asc' %}fa-sort-up{% else %}fa-sort-down{% endif %}"
                        style="position: relative; {% if current_sort == field and current_order == 'asc' %}top: 2px;{% else %}top: -2px;{% endif %} color: {{(label_colors[loop.index0 - 2] if loop.index0 >= 2)}}">
                     </i>
-                   <span class="ms-2">{{ (label_icons[loop.index0 - 2] if loop.index0 >= 2 else field) | safe }}</span>
+                   <span class="ms-2">{{ (label_icons[loop.index0 - 2] if loop.index0 >= 2 else labels_name[loop.index0]) | safe }}</span>
                 </a>
             {% endfor %}
         </div>
