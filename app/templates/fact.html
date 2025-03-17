@@ -6,6 +6,22 @@
 
 <div class="container">
     <div class="card source-card">
+        {% if fact.user_id == self_user_id  %}
+        <form id="deleteFactForm" method="POST" class="position-absolute" style="top: 10px; right: 10px;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="fact_id" value="{{ fact._id }}">
+            <button type="submit" class="btn btn-danger" style="text-decoration: none!important; color: white!important;" style="
+                top: 10px;
+                right: 10px;
+                text-decoration: none!important;
+                color: white!important;">
+                <i class="fas fa-times"></i>
+            </button>
+        </form>
+        <div class="m-4"></div>
+        {% endif %}
+
+
         <div class="p-4">
         <h3 class="text-primary">{{ fact.title }}</h3>
         <p><strong>{{ _words['context'] }}</strong></p>
@@ -99,6 +115,26 @@
                 console.error("Copy failed", error);
             });
         }
+
+
+    document.getElementById("deleteFactForm").addEventListener("submit", function(event) {
+        event.preventDefault();  // Stop default submission
+
+        let form = document.getElementById("deleteFactForm");
+
+        let newUrl = window.location.origin + window.location.pathname + "?_id={{ fact._id }}&baked=" + '{{ fact.title }} ({{ source.author }}, {{ source.year }})';
+        console.log(newUrl);
+        history.pushState({}, "", newUrl);
+
+        let formData = new FormData(this);
+
+        fetch("{{ url_for('database.deleteFact') }}", {
+            method: "POST",
+            body: formData
+        }).then(data => {
+              window.location.reload(); // Reloads the current page
+          })
+    });
 </script>
 
 {% endblock %}

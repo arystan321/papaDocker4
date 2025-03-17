@@ -131,6 +131,15 @@
                                 <span class="badge bg-secondary">Unknown</span>
                             {% endif %}
                         </td>
+                        <td>
+                            <form action="{{ url_for('database.deleteFact') }}" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="fact_id" value="{{ fact._id }}">
+                                <button type="submit" class="btn btn-danger" style="text-decoration: none!important; color: white!important;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
