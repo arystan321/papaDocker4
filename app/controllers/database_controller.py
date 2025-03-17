@@ -71,7 +71,7 @@ class DatabaseController(Singleton):
         if any(len(s) > 512 for s in [title, author, _type_id, link]):
             return {'error': 'Some field is too long!'}, 422
 
-        if DatabaseController.service.count_documents('sources', {}) >= os.getenv('SOURCES_MAX_COUNT', 10000):
+        if DatabaseController.service.count_documents('sources', {}) >= int(os.getenv('SOURCES_MAX_COUNT', 10000)):
             return {'error': 'Too many sources on server!'}, 403
 
         source = DatabaseController.service.create_source(title=title,
