@@ -135,11 +135,11 @@ class AuthenticationController(Singleton):
                                                user=user,
                                                facts=facts,
                                                labels=labels,
-                                               _primary_color=prefer_type.get('color', None),
+                                               _primary_color=prefer_type.get('color', '#007FFF'),
                                                prefer_type=prefer_type,
                                                redirect_manage_profile=AuthenticationController.service.redirect_profile_manage(),
                                                 patreon=patreon))
-        response.set_cookie('primary_color', prefer_type.get('color', None), httponly=True, secure=True, samesite='Lax')
+        response.set_cookie('primary_color', prefer_type.get('color', '#007FFF'), httponly=True, secure=True, samesite='Lax')
         return response
 
     @staticmethod
