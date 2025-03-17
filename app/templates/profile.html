@@ -68,9 +68,6 @@
                     <h4 class="card-title fw-bold">{{ patreon['data']['attributes']['full_name'] }}</h4>
                     <p class="text-muted">Patreon ID: <span class="fw-semibold">{{ patreon['data']['id'] }}</span></p>
                     <p class="badge bg-secondary">{{ patreon['data']['type'] | capitalize }}</p>
-                    <a href="{{ patreon['links']['self'] }}" class="btn btn-primary" style="color: black!important;">
-                        <i class="fab fa-patreon"></i> View Profile
-                    </a>
                 </div>
             </div>
             {% else %}
