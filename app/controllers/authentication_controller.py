@@ -1,4 +1,5 @@
 import json
+import os
 from collections import Counter
 
 from flask import request, redirect, url_for, session, make_response, jsonify
@@ -45,7 +46,7 @@ class AuthenticationController(Singleton):
 
         session.permanent = True
         token, refresh_token = AuthenticationController.service.callback(
-            f"{request.scheme}://{request.host}{request.path}",
+            f"{os.getenv('HOST')}{request.path}",
             request.args.get('code'), request.args.get('session_state'))
         session['access_token'] = token
         response = make_response(redirect(session.get('source_redirect')))
