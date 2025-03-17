@@ -13,6 +13,11 @@ from app.language import words
 web_bp = Blueprint('web', __name__)
 
 
+deleted_user = {
+                    '_id': '^$',
+                    'username': 'Deleted'
+                }
+
 @web_bp.route('/', methods=['GET'])
 def home():
     return render_template('index.html')
@@ -159,10 +164,7 @@ def factsView(authentication: dict = None):
             labels = DatabaseController.service.get_documents('labels', {})
             user = AuthenticationController.service.get_public_info(fact.get('user_id'))
             if not user.username:
-                user = {
-                    '_id': '^$',
-                    'username': 'Deleted'
-                }
+                user = deleted_user
             sorted_labels = sorted(labels, key=lambda x: x.get("order", 0))
             source = DatabaseController.service.get_document('sources', {'_id': ObjectId(fact.get('source_id'))})
             type = DatabaseController.service.get_document('types', {'_id': ObjectId(source.get('type'))})
@@ -189,7 +191,11 @@ def factsView(authentication: dict = None):
         facts, labels, page, limit, total_pages = get_cards('facts')
 
         for fact in facts:
-            fact['user'] = AuthenticationController.service.get_public_info(fact.get('user_id'))
+            user = AuthenticationController.service.get_public_info(fact.get('user_id'))
+            if not user.username:
+                fact['user'] = deleted_user
+            else:
+                fact['user'] = user
             labels_ = []
             for label in labels:
                 label_id = label.get('_id')
