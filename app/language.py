@@ -82,6 +82,8 @@ words = {
 
         'not_subscriber': 'Free profile support only * facts. You can login into patreon in your profile.',
         'max_subscriber': 'Paid profile only allows * facts.',
+        'delete': 'Delete',
+        'apply_filters': 'Apply filters',
     },
     'ru': {
         'logo': 'Factee',
@@ -122,7 +124,7 @@ words = {
         'source_link': 'Ссылка на источник',
         'author': 'Автор',
         'type': 'Тип',
-        'mediator': 'Посредник',
+        'mediator': 'Медиатор',
         'account_console': 'Консоль аккаунта',
         'how_to_create': 'Как создать *?',
         'how_to': 'Как',
@@ -166,6 +168,8 @@ words = {
 
         'not_subscriber': 'Бесплатная поддержка профиля только для * фактов. Вы можете войти в patreon в своем профиле.',
         'max_subscriber': 'Платный профиль допускает только * фактов.',
+        'delete': 'Удалить',
+        'apply_filters': 'Применить фильтры',
     },
     'kz': {
         'logo': 'Factee',
@@ -250,5 +254,7 @@ words = {
 
         'not_subscriber': 'Тегін профильді қолдау тек * фактілер. Сіз өзіңіздің профиліңізде patreon жүйесіне кіре аласыз.',
         'max_subscriber': 'Ақылы профиль тек * фактілерге рұқсат береді.',
+        'delete': 'Жою',
+        'apply_filters': 'Сүзгілерді қолданыңыз',
     },
 }

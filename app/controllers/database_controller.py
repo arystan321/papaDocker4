@@ -49,6 +49,19 @@ class DatabaseController(Singleton):
         return redirect(f'/facts?_id={fact.get("_id", "")}')
 
     @staticmethod
+    @blueprint.route('/facts/delete', methods=['POST'])
+    @Authenticated(required_roles=[AUTHENTICATED_ROLE])
+    @RequiredParams()
+    def deleteFact(fact_id: str, authentication: dict = None):
+        user_id = authentication.get('sub', None)
+        fact = DatabaseController.service.get_document('facts', {'_id': fact_id})
+        if user_id and fact and user_id == fact.get('user_id', None):
+            DatabaseController.service.delete_document('facts', {'_id': fact.get('_id', None)})
+            return redirect(request.referrer)
+        else:
+            return {'error': 'Wrong data'}, 422
+
+    @staticmethod
     @blueprint.route('/sources/create', methods=['POST'])
     @Authenticated(required_roles=[AUTHENTICATED_ROLE])
     @RequiredParams()
@@ -58,7 +71,7 @@ class DatabaseController(Singleton):
         if any(len(s) > 512 for s in [title, author, _type_id, link]):
             return {'error': 'Some field is too long!'}, 422
 
-        if DatabaseController.service.count_documents('sources', {}) >= os.getenv('SOURCES_MAX_COUNT', 10000):
+        if DatabaseController.service.count_documents('sources', {}) >= int(os.getenv('SOURCES_MAX_COUNT', 10000)):
             return {'error': 'Too many sources on server!'}, 403
 
         source = DatabaseController.service.create_source(title=title,

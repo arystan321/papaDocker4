@@ -51,7 +51,7 @@ def get_cards(collection: str, isSource=False):
     if username:
         users = AuthenticationController.service.get_public_info_by_username(username)
         user_id = users[0].get('id', '') if users else '^$'
-        if isSource:
+        if not isSource:
             match_filter['user_id'] = {'$regex': user_id, '$options': 'i'}
         else:
             match_filter['author'] = {'$regex': username, '$options': 'i'}
@@ -63,7 +63,7 @@ def get_cards(collection: str, isSource=False):
         match_filter['created_at'] = {'$gte': start_date, '$lt': end_date}
 
     sort_label = DatabaseController.service.get_document('labels', {'name': sort_field}) or {'_id': '^$'}
-    if sort_label:
+    if sort_label.get('_id') != '^$':
         sort_field = "sortLabelUsersCount"
 
     pipeline = [
@@ -120,7 +120,7 @@ def sourcesView(_id: str = None):
                                    baked=baked,
                                    factOrSourceRoute='sources',
                                    factOrSource=words[request.cookies.get('lang', 'en')]['source'])
-        sources, labels, page, limit, total_pages = get_cards('sources')
+        sources, labels, page, limit, total_pages = get_cards('sources', True)
 
         for source in sources:
             source['user'] = {'username': source.get('author', '')}
@@ -143,7 +143,8 @@ def sourcesView(_id: str = None):
                                limit=limit,
                                labels=labels,
                                total_pages=total_pages,
-                               redirect='web.sourcesView')
+                               redirect='web.sourcesView',
+                               isSources=True)
 
 
 @web_bp.route('/facts', methods=['GET'])

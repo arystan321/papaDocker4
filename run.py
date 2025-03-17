@@ -43,9 +43,12 @@ def generate_nonce():
 def add_security_headers(response):
     response.headers["X-Frame-Options"] = "DENY"
     response.headers['Content-Security-Policy'] = f"default-src 'self'; " \
-                                                  f"style-src 'self' 'sha256-/pKNHmGRCORjIYUPE3fRB7lJIjWnuhyErIcu5EbSucM=' https://cdnjs.cloudflare.com;" \
-                                                  f"script-src 'self' https://cdn.jsdelivr.net;" \
-                                                  f"frame-ancestors 'none';" \
+                                                  f"style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com;" \
+                                                  f"style-src 'nonce-{g.get('nonce', None)}';" \
+                                                  f"script-src 'self' 'nonce-{g.get('nonce', None)}' https://cdn.jsdelivr.net;" \
+                                                  f"font-src 'self' https://cdnjs.cloudflare.com data:;" \
+                                                  f"img-src 'self' https://cdnjs.cloudflare.com data: https://*.patreonusercontent.com/;" \
+                                                  f"frame-ancestors 'self' https://cdnjs.cloudflare.com;" \
                                                   f"form-action 'self';"
     return response
 

@@ -19,7 +19,7 @@ class AuthenticationController(Singleton):
     @staticmethod
     @blueprint.route('/login', methods=['GET', 'POST'])
     @RequiredParams()
-    def login(source_redirect: str = '/'):
+    def login(source_redirect: str = None):
         if request.method == 'POST':
             username = request.form['username']
             password = request.form['password']
@@ -34,7 +34,7 @@ class AuthenticationController(Singleton):
                 response = make_response(redirect(url_for('authentication.profile')))
                 response.set_cookie('access_token', token, httponly=True, secure=True, samesite='Lax')
                 return response
-        session['source_redirect'] = source_redirect
+        session['source_redirect'] = source_redirect or request.referrer
         return redirect(AuthenticationController.service.redirect_login())
 
     @staticmethod

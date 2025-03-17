@@ -8,7 +8,7 @@
 
 <div class="form-container">
     <form action="{{ url_for('database.createFact') }}" method="POST">
-        {{ csrf_token() }}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div>
             <h1 style="display: inline;">{{ _words['create_a_new'].replace('*', _words['fact'].title()) }}</h1>
             <a href="{{ url_for('web.howTo') }}#how_to_fact" title="{{ _words['how_to_create'].replace('*', _words['fact']) }}" style="display: inline-block; color: black!important;"><h4><i class="fa-solid fa-circle-question"></i></h4></a>
@@ -25,8 +25,8 @@
         <!-- Search Source and Source Selection -->
         <div class="form-group">
             <label for="source_id">{{ _words['source'].title() }}</label>
-            <input type="text" id="searchSource" onkeyup="filterSources()" placeholder="{{ _words['search_source'] }}..." maxlength="512">
-            <select id="source_id" name="source_id" required onchange="updatePreview()">
+            <input type="text" id="searchSource" placeholder="{{ _words['search_source'] }}..." maxlength="512">
+            <select id="source_id" name="source_id" required>
                 <option value="">{{ _words['select_source'] }}</option>
                 {% for source in sources %}
                     <option value="{{ source._id }}" data-author="{{ source.author }}" data-year="{{ source.year }}">
@@ -40,12 +40,12 @@
         <div class="textarea-container mt-2">
             <label for="quote">{{ _words['quote'] }}</label>
             <i class="fa-solid fa-quote-left"></i>
-            <textarea id="quote" name="quote" maxlength="512" oninput="updatePreview()"></textarea>
+            <textarea id="quote" name="quote" maxlength="512"></textarea>
             <i class="fa-solid fa-quote-right"></i>
 
             <div>
                 <label for="page">{{ _words['page'] }}</label>
-                <input type="number" id="page" name="page" class="small-input" required min="1" oninput="updatePreview()">
+                <input type="number" id="page" name="page" class="small-input" required min="1">
             </div>
         </div>
 
@@ -55,7 +55,12 @@
         <input type="submit" value="{{ _words['create'].replace('*', _words['fact']) }}">
     </form>
 </div>
-    <script>
+    <script nonce="{{ _nonce }}">
+        document.getElementById("page").addEventListener("input", updatePreview);
+        document.getElementById("quote").addEventListener("input", updatePreview);
+
+        document.getElementById("source_id").addEventListener("change", updatePreview);
+        document.getElementById("searchSource").addEventListener("keyup", filterSources);
         function updatePreview() {
             let sourceSelect = document.getElementById("source_id");
             let selectedOption = sourceSelect.options[sourceSelect.selectedIndex];

@@ -9,7 +9,7 @@
 
             <div class="row">
                 <div class="col-md-6 text-end" style="width: 64px; height: 64px; padding: 0 0;">
-                    <img class="avatar w-16 h-16" src="{{ url_for('image.getAvatar', username=user.username) }}" alt="{{ _words['user_avatar'] }}">
+                    <img class="avatar" src="{{ url_for('image.getAvatar', username=user.username) }}" alt="{{ _words['user_avatar'] }}">
                 </div>
                 <div class="col-md-6 d-flex flex-column justify-content-center">
                     <h2 class="card-title" style="margin-bottom: 0;">{{ user.username }}</h2>
@@ -68,9 +68,6 @@
                     <h4 class="card-title fw-bold">{{ patreon['data']['attributes']['full_name'] }}</h4>
                     <p class="text-muted">Patreon ID: <span class="fw-semibold">{{ patreon['data']['id'] }}</span></p>
                     <p class="badge bg-secondary">{{ patreon['data']['type'] | capitalize }}</p>
-                    <a href="{{ patreon['links']['self'] }}" class="btn btn-primary" style="color: black!important;">
-                        <i class="fab fa-patreon"></i> View Profile
-                    </a>
                 </div>
             </div>
             {% else %}
@@ -98,9 +95,10 @@
             <table class="table table-striped table-hover table-bordered table-responsive">
                 <thead class="table-dark">
                     <tr>
-                        <th>Title</th>
-                        <th>Source</th>
-                        <th>Type</th>
+                        <th>{{ _words['title'] }}</th>
+                        <th>{{ _words['source'].title() }}</th>
+                        <th>{{ _words['type'] }}</th>
+                        <th>{{ _words['delete'] }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -130,6 +128,15 @@
                             {% else %}
                                 <span class="badge bg-secondary">Unknown</span>
                             {% endif %}
+                        </td>
+                        <td>
+                            <form action="{{ url_for('database.deleteFact') }}" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="fact_id" value="{{ fact._id }}">
+                                <button type="submit" class="btn btn-danger" style="text-decoration: none!important; color: white!important;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                     {% endfor %}

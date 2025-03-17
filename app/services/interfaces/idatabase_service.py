@@ -68,6 +68,10 @@ class DatabaseService(ABC):
         pass
 
     @abstractmethod
+    def delete_document(self, collection: str, query: dict):
+        pass
+
+    @abstractmethod
     def count_documents(self, collection: str, query: dict) -> int:
         """
         @:return count of query docuemnts

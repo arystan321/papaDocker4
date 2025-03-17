@@ -38,7 +38,15 @@
     </ul>
 </nav>
 
-<script>
+<script nonce="{{ _nonce }}">
+        document.getElementById("apply-filters").addEventListener("click", applyFilters);
+        document.getElementById("title-sorting").addEventListener("click", function() {
+            updateSorting('title');
+        });
+        document.getElementById("created_at-sorting").addEventListener("click", function() {
+            updateSorting('created_at');
+        });
+
         function updateSorting(field) {
             const urlParams = new URLSearchParams(window.location.search);
             let currentOrder = urlParams.get('sort_order') || 'desc';
@@ -86,7 +94,7 @@
                 <input type="number" id="year" class="form-control" placeholder="Year" value="{{ request.args.get('year', '') }}">
             </div>
             <div class="col-md-2">
-                <button class="btn btn-primary w-100" onclick="applyFilters()">Apply Filters</button>
+                <button class="btn btn-primary w-100">Apply Filters</button>
             </div>
         </div>
     </div>
@@ -96,13 +104,13 @@
         <thead class="table-dark">
             <tr>
                 <th scope="col">Title
-                    <button class="btn btn-sm btn-light" onclick="updateSorting('title')">↕</button>
+                    <button id="title-sorting" class="btn btn-sm btn-light">↕</button>
                 </th>
                 <th scope="col">Username
 
                 </th>
                 <th scope="col">Date
-                    <button class="btn btn-sm btn-light" onclick="updateSorting('created_at')">↕</button>
+                    <button id="created_at-sorting" class="btn btn-sm btn-light">↕</button>
                 </th>
                 {% for label in labels %}
                     <th>{{ label.name }}</th>
