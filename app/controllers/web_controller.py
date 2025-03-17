@@ -175,7 +175,7 @@ def factsView(authentication: dict = None):
                                    source=source,
                                    type=type,
                                    labels=sorted_labels,
-                                   _primary_color=type.get('color'))
+                                   _primary_color=type.get('color', '#000000'))
         else:
             return render_template('baked.html',
                                    baked=baked,

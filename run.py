@@ -24,7 +24,7 @@ def datetime_format(value):
 def inject_primary_color():
     """Inject primary_color from cookies into all templates."""
     return {
-        "_primary_color": request.cookies.get('primary_color', '#ffffff'),
+        "_primary_color": request.cookies.get('primary_color', '#000000'),
         "_username": request.cookies.get('username', None),
         "AUTHENTICATED_ROLE": AUTHENTICATED_ROLE,
         "_words": words.get(request.cookies.get('lang', 'en'), words.get('en')),
