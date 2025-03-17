@@ -8,22 +8,22 @@
 
 <div class="form-container">
     <form action="{{ url_for('database.createSource') }}" method="POST">
-        {{ csrf_token() }}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div>
             <h1 style="display: inline;">{{ _words['create_a_new'].replace('*', _words['source'].title()) }}</h1>
             <a href="{{ url_for('web.howTo') }}#how_to_source" title="{{ _words['how_to_create'].replace('*', _words['fact']) }}" style="display: inline-block; color: black!important;"><h4><i class="fa-solid fa-circle-question"></i></h4></a>
         </div>
         <label for="title">{{ _words['title'] }}</label>
-        <textarea maxlength="512" id="title" name="title" required oninput="updatePreview()"></textarea><br>
+        <textarea maxlength="512" id="title" name="title" required></textarea><br>
 
         <label for="author">{{ _words['author'] }}</label>
-        <textarea maxlength="512" type="text" id="author" name="author" required oninput="updatePreview()"></textarea><br>
+        <textarea maxlength="512" type="text" id="author" name="author" required></textarea><br>
 
         <label for="year">{{ _words['year'] }}</label>
-        <input class="small-input" type="number" id="year" name="year" required oninput="updatePreview()"><br>
+        <input class="small-input" type="number" id="year" name="year" required><br>
 
         <label for="_type_id">{{ _words['type'] }}</label>
-        <select id="_type_id" name="_type_id" required onchange="updateSelectColor(this)" style="font-weight: bold; color: black;">
+        <select id="_type_id" name="_type_id" required style="font-weight: bold; color: black;">
             <option value="">{{ _words['select_a_knowledge_type'] }}</option>
             {% for _type in types %}
                 <option style="background-color: {{ _type.color }}; font-weight: bold; color: white;" value="{{ _type._id }}" data-color="{{ _type.color }}">{{ _type.name }}</option>
@@ -40,7 +40,14 @@
     </form>
 </div>
 
-<script>
+<script nonce="{{ _nonce }}">
+    document.getElementById("year").addEventListener("input", updatePreview);
+    document.getElementById("author").addEventListener("input", updatePreview);
+    document.getElementById("title").addEventListener("input", updatePreview);
+
+    document.getElementById("_type_id").addEventListener("change", function() {
+        updateSelectColor(this);
+    });
     function updatePreview() {
             let title = document.getElementById("title").value || "";
             let author = document.getElementById("author").value || "";

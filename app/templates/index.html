@@ -68,7 +68,7 @@
         </ul>
         <ul class="bottom">
             <li>
-                <select class="side-selection" id="language-selector" onchange="setLanguage(this.value)">
+                <select id="lang-selection" class="side-selection" id="language-selector">
                     <option value="en">English</option>
                     <option value="ru">Русский</option>
                     <option value="kz">Қазақ</option>
@@ -85,7 +85,7 @@
 
     <!-- Toggle Button Container (Fixed and Vertical) -->
     <div class="toggle-container collapsed" id="toggle-container">
-        <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+        <button id="toggle-btn" class="toggle-btn">☰</button>
         <a href="/facts"><button class="toggle-btn toggle-btn-static"><i class="fa-solid fa-lightbulb"></i></button></a>
         <a href="/facts/create"><button class="toggle-btn toggle-btn-static"><i class="fa-solid fa-plus"></i></button></a>
 
@@ -121,7 +121,11 @@
         </footer>
     </div>
 
-    <script>
+    <script nonce="{{ _nonce }}">
+        document.getElementById("toggle-btn").addEventListener("click", toggleSidebar);
+        document.getElementById("lang-selection").addEventListener("change", function() {
+             setLanguage(this.value);
+        });
         function toggleSidebar() {
             let sidebar = document.getElementById("sidebar");
             let toggle_container = document.getElementById("toggle-container");

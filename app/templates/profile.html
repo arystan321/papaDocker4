@@ -9,7 +9,7 @@
 
             <div class="row">
                 <div class="col-md-6 text-end" style="width: 64px; height: 64px; padding: 0 0;">
-                    <img class="avatar w-16 h-16" src="{{ url_for('image.getAvatar', username=user.username) }}" alt="{{ _words['user_avatar'] }}">
+                    <img class="avatar" src="{{ url_for('image.getAvatar', username=user.username) }}" alt="{{ _words['user_avatar'] }}">
                 </div>
                 <div class="col-md-6 d-flex flex-column justify-content-center">
                     <h2 class="card-title" style="margin-bottom: 0;">{{ user.username }}</h2>
