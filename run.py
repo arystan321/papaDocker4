@@ -54,4 +54,14 @@ def add_security_headers(response):
 
 
 if __name__ == "__main__":
-    app.run()
+    host = os.getenv('HOST_IP', '0.0.0.0')
+    port = int(os.getenv('PORT', 5000))
+    ssl_crt = os.getenv('SSL_CRT_FILE', '').strip()
+    ssl_key = os.getenv('SSL_KEY_FILE', '').strip()
+
+    if ssl_crt and ssl_key:  # Use SSL only if both files are provided
+        context = (ssl_crt, ssl_key)
+    else:
+        context = None  # Run without SSL
+
+    app.run(host=host, port=port, ssl_context=context)
