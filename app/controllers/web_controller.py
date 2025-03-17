@@ -158,6 +158,11 @@ def factsView(authentication: dict = None):
         if fact:
             labels = DatabaseController.service.get_documents('labels', {})
             user = AuthenticationController.service.get_public_info(fact.get('user_id'))
+            if not user.username:
+                user = {
+                    '_id': '^$',
+                    'username': 'Deleted'
+                }
             sorted_labels = sorted(labels, key=lambda x: x.get("order", 0))
             source = DatabaseController.service.get_document('sources', {'_id': ObjectId(fact.get('source_id'))})
             type = DatabaseController.service.get_document('types', {'_id': ObjectId(source.get('type'))})
