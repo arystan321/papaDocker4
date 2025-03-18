@@ -114,6 +114,16 @@ class KeyCloak(AuthenticationService):
 
         return response.json()
 
+    def get_users(self):
+        self.ADMIN_TOKEN = self.get_admin_token()
+        url = f"{self.KEYCLOAK_SERVER}/admin/realms/{self.REALM}/users"
+        headers = {
+            'Authorization': f'Bearer {self.ADMIN_TOKEN}',
+            'Content-Type': 'application/json'
+        }
+        response = requests.get(url, headers=headers, verify=False)
+        return response.json()
+
     def get_public_info(self, sub: str) -> (dict, str, int):
         self.ADMIN_TOKEN = self.get_admin_token()
         url = f"{self.KEYCLOAK_SERVER}/admin/realms/{self.REALM}/users/{sub}"
