@@ -116,8 +116,10 @@ def sourcesView(_id: str = None):
         sorted_labels = sorted(labels, key=lambda x: x.get("order", 0))
 
         source = DatabaseController.service.get_document('sources', {'_id': ObjectId(_id)})
+        type = DatabaseController.service.get_document('types', {'_id': ObjectId(source.get('type'))})
         return render_template('source.html',
                                source=source,
+                               type=type,
                                labels=sorted_labels)
     else:
         if baked:
@@ -140,6 +142,8 @@ def sourcesView(_id: str = None):
                                 'color': label.get('color'),
                                 'count': len(matching_label.get('users', [])) if matching_label else 0})
             source['labels_'] = labels_
+
+            source['type'] = DatabaseController.service.get_document('types', {'_id': ObjectId(source.get('type'))})
 
         return render_template('cards.html',
                                title=words[request.cookies.get('lang', 'en')]['source_list'],
@@ -206,6 +210,9 @@ def factsView(authentication: dict = None):
                                 'color': label.get('color'),
                                 'count': len(matching_label.get('users', [])) if matching_label else 0})
             fact['labels_'] = labels_
+
+            source = DatabaseController.service.get_document('sources', {'_id': fact.get('source_id', '^$')})
+            fact['type'] = DatabaseController.service.get_document('types', {'_id': ObjectId(source.get('type'))})
 
         return render_template('cards.html',
                                title=words[request.cookies.get('lang', 'en')]['fact_list'],
