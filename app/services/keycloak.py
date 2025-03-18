@@ -124,6 +124,9 @@ class KeyCloak(AuthenticationService):
 
         response = requests.get(url, headers=headers, verify=False)
         user_data = response.json()
+        if not user_data.get:
+            user_data = {}
+
         return {
             "id": user_data.get("id", ''),
             "username": user_data.get("username", ''),
