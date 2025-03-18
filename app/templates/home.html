@@ -127,7 +127,7 @@
             <a href="/profile" class="text-center center text-decoration-none">
                 <div class="card shadow p-4 d-flex align-items-center justify-content-center text-center">
                     <div class="toggle-btn">
-                        <img class="avatar" src="/avatar/default" alt="User Avatar">
+                        <img class="avatar" src="{{ url_for('image.getAvatar', username=_username) if _username else url_for('image.getAvatar', username='default') }}" alt="User Avatar">
                     </div>
                     <p class="text-muted">{{ _words['profile'] }}</p>
                 </div>
