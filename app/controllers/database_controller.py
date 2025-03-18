@@ -30,7 +30,7 @@ class DatabaseController(Singleton):
             return {'error': 'Some field is too long!'}, 422
 
         existing_fact = DatabaseController.service.get_document('facts', {'title': title})
-        if existing_fact.get('user_id', '') != user_id:
+        if existing_fact and existing_fact.get('user_id', '') != user_id:
             return {'error': 'Fact with that name exists, and that not your fact.'}, 403
 
         user_facts_count = DatabaseController.service.count_documents('facts', {'user_id': user_id})
