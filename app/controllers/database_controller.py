@@ -24,7 +24,9 @@ class DatabaseController(Singleton):
     def createFact(title: str, context: str, page: int, quote: str, source_id: str, authentication: dict = None):
         user_id = authentication.get('sub')
 
-        if any(len(s) > 512 for s in [title, context, quote, source_id]):
+        if any(len(s) > 512 for s in [title, context, source_id]):
+            return {'error': 'Some field is too long!'}, 422
+        if len(quote) > 1024:
             return {'error': 'Some field is too long!'}, 422
 
         user_facts_count = DatabaseController.service.count_documents('facts', {'user_id': user_id})
