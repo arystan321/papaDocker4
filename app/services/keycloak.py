@@ -125,13 +125,13 @@ class KeyCloak(AuthenticationService):
         response = requests.get(url, headers=headers, verify=False)
         user_data = response.json()
         return {
-            "id": user_data.get("id"),
-            "username": user_data.get("username"),
-            "first_name": user_data.get("firstName"),
-            "last_name": user_data.get("lastName"),
-            "email": user_data.get("email"),
-            "enabled": user_data.get("enabled"),
-            "created_at": user_data.get("createdTimestamp"),
+            "id": user_data.get("id", ''),
+            "username": user_data.get("username", ''),
+            "first_name": user_data.get("firstName", ''),
+            "last_name": user_data.get("lastName", ''),
+            "email": user_data.get("email", ''),
+            "enabled": user_data.get("enabled", ''),
+            "created_at": user_data.get("createdTimestamp", ''),
         }
 
     def get_public_info_by_username(self, username: str) -> (dict, str, int):
