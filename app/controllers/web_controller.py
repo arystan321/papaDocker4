@@ -120,7 +120,8 @@ def sourcesView(_id: str = None):
         return render_template('source.html',
                                source=source,
                                type=type,
-                               labels=sorted_labels)
+                               labels=sorted_labels,
+                               _primary_color=type.get('color', '#000000'))
     else:
         if baked:
             return render_template('baked.html',
