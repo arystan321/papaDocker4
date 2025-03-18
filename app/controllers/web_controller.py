@@ -18,9 +18,21 @@ deleted_user = {
                     'username': 'Deleted'
                 }
 
+
 @web_bp.route('/', methods=['GET'])
 def home():
-    return render_template('index.html')
+    facts_count = DatabaseController.service.count_documents('facts', {})
+    sources_count = DatabaseController.service.count_documents('sources', {})
+    users = AuthenticationController.service.get_users()
+    verified_users = []
+    for user in users:
+        if user.get('emailVerified', False):
+            verified_users.append(user)
+    users_count = len(verified_users)
+    return render_template('home.html',
+                           facts_count=facts_count,
+                           sources_count=sources_count,
+                           users_count=users_count)
 
 
 @web_bp.route('/facts/create', methods=['GET'])
