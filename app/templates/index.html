@@ -68,7 +68,7 @@
         </ul>
         <ul class="bottom">
             <li>
-                <select id="lang-selection" class="side-selection" id="language-selector">
+                <select class="side-selection" id="language-selector">
                     <option value="en">English</option>
                     <option value="ru">Русский</option>
                     <option value="kz">Қазақ</option>
@@ -126,7 +126,7 @@
 
     <script nonce="{{ _nonce }}">
         document.getElementById("toggle-btn").addEventListener("click", toggleSidebar);
-        document.getElementById("lang-selection").addEventListener("change", function() {
+        document.getElementById("language-selector").addEventListener("change", function() {
              setLanguage(this.value);
         });
         function toggleSidebar() {
