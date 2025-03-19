@@ -84,6 +84,10 @@ words = {
         'max_subscriber': 'Paid profile only allows * facts.',
         'delete': 'Delete',
         'apply_filters': 'Apply filters',
+
+        'dashboard': 'Dashboard',
+        'total': 'Total',
+        'users': 'mediators',
     },
     'ru': {
         'logo': 'Factee',
@@ -170,6 +174,10 @@ words = {
         'max_subscriber': 'Платный профиль допускает только * фактов.',
         'delete': 'Удалить',
         'apply_filters': 'Применить фильтры',
+
+        'dashboard': 'Панель приборов',
+        'total': 'Всего',
+        'users': 'медиаторов',
     },
     'kz': {
         'logo': 'Factee',
@@ -256,5 +264,9 @@ words = {
         'max_subscriber': 'Ақылы профиль тек * фактілерге рұқсат береді.',
         'delete': 'Жою',
         'apply_filters': 'Сүзгілерді қолданыңыз',
+
+        'dashboard': 'Бақылау тақтасы',
+        'total': 'Жалпы',
+        'users': 'дәнекерлеушілер',
     },
 }

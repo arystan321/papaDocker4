@@ -13,9 +13,26 @@ from app.language import words
 web_bp = Blueprint('web', __name__)
 
 
+deleted_user = {
+                    '_id': '^$',
+                    'username': 'Deleted'
+                }
+
+
 @web_bp.route('/', methods=['GET'])
 def home():
-    return render_template('index.html')
+    facts_count = DatabaseController.service.count_documents('facts', {})
+    sources_count = DatabaseController.service.count_documents('sources', {})
+    users = AuthenticationController.service.get_users()
+    verified_users = []
+    for user in users:
+        if user.get('emailVerified', False):
+            verified_users.append(user)
+    users_count = len(verified_users)
+    return render_template('home.html',
+                           facts_count=facts_count,
+                           sources_count=sources_count,
+                           users_count=users_count)
 
 
 @web_bp.route('/facts/create', methods=['GET'])
@@ -111,9 +128,12 @@ def sourcesView(_id: str = None):
         sorted_labels = sorted(labels, key=lambda x: x.get("order", 0))
 
         source = DatabaseController.service.get_document('sources', {'_id': ObjectId(_id)})
+        type = DatabaseController.service.get_document('types', {'_id': ObjectId(source.get('type'))})
         return render_template('source.html',
                                source=source,
-                               labels=sorted_labels)
+                               type=type,
+                               labels=sorted_labels,
+                               _primary_color=type.get('color', '#000000'))
     else:
         if baked:
             return render_template('baked.html',
@@ -135,6 +155,8 @@ def sourcesView(_id: str = None):
                                 'color': label.get('color'),
                                 'count': len(matching_label.get('users', [])) if matching_label else 0})
             source['labels_'] = labels_
+
+            source['type'] = DatabaseController.service.get_document('types', {'_id': ObjectId(source.get('type'))})
 
         return render_template('cards.html',
                                title=words[request.cookies.get('lang', 'en')]['source_list'],
@@ -158,11 +180,8 @@ def factsView(authentication: dict = None):
         if fact:
             labels = DatabaseController.service.get_documents('labels', {})
             user = AuthenticationController.service.get_public_info(fact.get('user_id'))
-            if not user.username:
-                user = {
-                    '_id': '^$',
-                    'username': 'Deleted'
-                }
+            if not user.get('username', None):
+                user = deleted_user
             sorted_labels = sorted(labels, key=lambda x: x.get("order", 0))
             source = DatabaseController.service.get_document('sources', {'_id': ObjectId(fact.get('source_id'))})
             type = DatabaseController.service.get_document('types', {'_id': ObjectId(source.get('type'))})
@@ -173,7 +192,7 @@ def factsView(authentication: dict = None):
                                    source=source,
                                    type=type,
                                    labels=sorted_labels,
-                                   _primary_color=type.get('color'))
+                                   _primary_color=type.get('color', '#000000'))
         else:
             return render_template('baked.html',
                                    baked=baked,
@@ -189,7 +208,11 @@ def factsView(authentication: dict = None):
         facts, labels, page, limit, total_pages = get_cards('facts')
 
         for fact in facts:
-            fact['user'] = AuthenticationController.service.get_public_info(fact.get('user_id'))
+            user = AuthenticationController.service.get_public_info(fact.get('user_id'))
+            if not user.get('username', None):
+                fact['user'] = deleted_user
+            else:
+                fact['user'] = user
             labels_ = []
             for label in labels:
                 label_id = label.get('_id')
@@ -200,6 +223,9 @@ def factsView(authentication: dict = None):
                                 'color': label.get('color'),
                                 'count': len(matching_label.get('users', [])) if matching_label else 0})
             fact['labels_'] = labels_
+
+            source = DatabaseController.service.get_document('sources', {'_id': fact.get('source_id', '^$')})
+            fact['type'] = DatabaseController.service.get_document('types', {'_id': ObjectId(source.get('type'))})
 
         return render_template('cards.html',
                                title=words[request.cookies.get('lang', 'en')]['fact_list'],

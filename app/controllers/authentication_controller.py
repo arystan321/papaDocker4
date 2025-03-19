@@ -1,4 +1,5 @@
 import json
+import os
 from collections import Counter
 
 from flask import request, redirect, url_for, session, make_response, jsonify
@@ -45,7 +46,7 @@ class AuthenticationController(Singleton):
 
         session.permanent = True
         token, refresh_token = AuthenticationController.service.callback(
-            f"{request.scheme}://{request.host}{request.path}",
+            f"{os.getenv('HOST')}{request.path}",
             request.args.get('code'), request.args.get('session_state'))
         session['access_token'] = token
         response = make_response(redirect(session.get('source_redirect')))
@@ -54,7 +55,7 @@ class AuthenticationController(Singleton):
 
         authentication = AuthenticationController.service.get_roles(token)
         facts, labels, prefer_type = AuthenticationController.get_user_summary(authentication.get('sub'))
-        response.set_cookie('primary_color', prefer_type.get('color', ''), httponly=True, secure=True, samesite='Lax')
+        response.set_cookie('primary_color', prefer_type.get('color', '#000000'), httponly=True, secure=True, samesite='Lax')
         response.set_cookie('username', authentication.get('username'), httponly=True, secure=True, samesite='Lax')
 
         return response
@@ -135,11 +136,11 @@ class AuthenticationController(Singleton):
                                                user=user,
                                                facts=facts,
                                                labels=labels,
-                                               _primary_color=prefer_type.get('color', '#007FFF'),
+                                               _primary_color=prefer_type.get('color', '#000000'),
                                                prefer_type=prefer_type,
                                                redirect_manage_profile=AuthenticationController.service.redirect_profile_manage(),
                                                 patreon=patreon))
-        response.set_cookie('primary_color', prefer_type.get('color', '#007FFF'), httponly=True, secure=True, samesite='Lax')
+        response.set_cookie('primary_color', prefer_type.get('color', '#000000'), httponly=True, secure=True, samesite='Lax')
         return response
 
     @staticmethod
@@ -162,6 +163,6 @@ class AuthenticationController(Singleton):
                                user=user,
                                facts=facts,
                                labels=labels,
-                               _primary_color=prefer_type.get('color', None),
+                               _primary_color=prefer_type.get('color', '#000000'),
                                prefer_type=prefer_type,
                                isSideProfile=True)

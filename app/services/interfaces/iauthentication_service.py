@@ -33,6 +33,10 @@ class AuthenticationService(ABC):
         pass
 
     @abstractmethod
+    def get_users(self):
+        pass
+
+    @abstractmethod
     def get_public_info(self, sub: str) -> (dict, str, int):
         """
         @:return public info of user

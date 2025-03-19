@@ -68,7 +68,7 @@
         </ul>
         <ul class="bottom">
             <li>
-                <select id="lang-selection" class="side-selection" id="language-selector">
+                <select class="side-selection" id="language-selector">
                     <option value="en">English</option>
                     <option value="ru">Русский</option>
                     <option value="kz">Қазақ</option>
@@ -117,13 +117,23 @@
 
         <footer>
             {% block footer %}{% endblock %}
-            &copy; 2025 Tunaxx Dev, prof.mordvintsev@gmail.com
+            &copy; 2025 tunaxx_dev
+            &nbsp;|&nbsp;
+            prof.mordvintsev@gmail.com
+            &nbsp;|&nbsp;
+            <a href="https://github.com/Tunaxx-New/Factee" target="_blank">
+                <i class="fab fa-github"></i> Source code
+            </a>
+            &nbsp;|&nbsp;
+            <a href="https://patreon.com/tunaxx_dev" target="_blank">
+                <i class="fab fa-patreon"></i> Subscribe on Patreon
+            </a>
         </footer>
     </div>
 
     <script nonce="{{ _nonce }}">
         document.getElementById("toggle-btn").addEventListener("click", toggleSidebar);
-        document.getElementById("lang-selection").addEventListener("change", function() {
+        document.getElementById("language-selector").addEventListener("change", function() {
              setLanguage(this.value);
         });
         function toggleSidebar() {

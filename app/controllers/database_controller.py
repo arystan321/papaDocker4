@@ -24,8 +24,14 @@ class DatabaseController(Singleton):
     def createFact(title: str, context: str, page: int, quote: str, source_id: str, authentication: dict = None):
         user_id = authentication.get('sub')
 
-        if any(len(s) > 512 for s in [title, context, quote, source_id]):
+        if any(len(s) > 512 for s in [title, context, source_id]):
             return {'error': 'Some field is too long!'}, 422
+        if len(quote) > 1024:
+            return {'error': 'Some field is too long!'}, 422
+
+        existing_fact = DatabaseController.service.get_document('facts', {'title': title})
+        if existing_fact:
+            return {'error': 'Fact with that name exists.'}, 403
 
         user_facts_count = DatabaseController.service.count_documents('facts', {'user_id': user_id})
         if user_facts_count >= int(os.getenv('FACTS_MAX_COUNT_DEFAULT', 10)):
@@ -70,6 +76,10 @@ class DatabaseController(Singleton):
 
         if any(len(s) > 512 for s in [title, author, _type_id, link]):
             return {'error': 'Some field is too long!'}, 422
+
+        existing_source = DatabaseController.service.get_document('sources', {'title': title})
+        if existing_source:
+            return {'error': 'Source is already exists.'}, 403
 
         if DatabaseController.service.count_documents('sources', {}) >= int(os.getenv('SOURCES_MAX_COUNT', 10000)):
             return {'error': 'Too many sources on server!'}, 403

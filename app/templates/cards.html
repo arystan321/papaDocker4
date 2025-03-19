@@ -46,6 +46,9 @@
                     </div>
                 </div>
                 <h6 class="card-title">{{ card.title }}</h6>
+                <div>
+                    <span class="badge text-white px-2 py-1 rounded" style="background-color: {{ card.type.color }};">{{ card.type.name }}</span><br>
+                </div>
                 <div class="mt-auto">
                 <p class="card-text text-muted small"><strong>{{ _words['created_at'] }}:</strong> {{ card.created_at }}</p>
                 {% for label in card.labels_ %}

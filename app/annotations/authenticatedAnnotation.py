@@ -22,7 +22,8 @@ def Authenticated(required_roles: list[str], is_necessary=True):
             authentication: dict = service.get_roles(token)
 
             if authentication and not authentication.get('active', True):
-                return redirect(url_for('authentication.login', source_redirect=request.path))
+                if is_necessary:
+                    return redirect(url_for('authentication.login', source_redirect=request.path))
 
             if not all(role in authentication.get('realm_access', {}).get('roles', []) for role in required_roles):
                 return jsonify({"message": "User does not have the required roles."}), 403

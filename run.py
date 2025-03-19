@@ -24,7 +24,7 @@ def datetime_format(value):
 def inject_primary_color():
     """Inject primary_color from cookies into all templates."""
     return {
-        "_primary_color": request.cookies.get('primary_color', '#ffffff'),
+        "_primary_color": request.cookies.get('primary_color', '#000000'),
         "_username": request.cookies.get('username', None),
         "AUTHENTICATED_ROLE": AUTHENTICATED_ROLE,
         "_words": words.get(request.cookies.get('lang', 'en'), words.get('en')),
@@ -54,4 +54,14 @@ def add_security_headers(response):
 
 
 if __name__ == "__main__":
-    app.run()
+    host = os.getenv('HOST_IP', '0.0.0.0')
+    port = int(os.getenv('PORT', 5000))
+    ssl_crt = os.getenv('SSL_CRT_FILE', '').strip()
+    ssl_key = os.getenv('SSL_KEY_FILE', '').strip()
+
+    if ssl_crt and ssl_key:  # Use SSL only if both files are provided
+        context = (ssl_crt, ssl_key)
+    else:
+        context = None  # Run without SSL
+
+    app.run(host=host, port=port, ssl_context=context)
