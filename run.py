@@ -12,6 +12,7 @@ app = create_app()
 app.config["SECRET_KEY"] = os.getenv('SECRET')
 CORS(app, origins=[os.getenv('CORS_WEB')])
 csrf = CSRFProtect(app)
+csrf.init_app(app)
 
 
 @app.template_filter('datetime_format')
