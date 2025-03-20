@@ -36,7 +36,7 @@ def RequiredParams():
                         # Try to cast the value to the specified type
                         value = param.annotation(value)
                 except (ValueError, TypeError) as e:
-                    return jsonify({"error": f"Invalid value for parameter '{param_name}': {str(e)}"}), 400
+                    return jsonify({"error": f"Invalid value for parameter '{param_name}'"}), 400
 
                 extracted_params[param_name] = value
 
