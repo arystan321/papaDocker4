@@ -121,17 +121,3 @@ class DatabaseController(Singleton):
         user_id = authentication.get('sub')
 
         return {"response": DatabaseController.service.react(_id, _collection, _label, user_id)}
-
-    @staticmethod
-    @blueprint.route('/facts/create', methods=['POST'])
-    @Authenticated(required_roles=[AUTHENTICATED_ROLE])
-    @RequiredParams()
-    def getProfileFacts(company_name: str = 'default', isCreate: bool = False, authentication: dict = None):
-        document = DatabaseController.service.get_document('companies', {
-            'name': company_name
-        }) or {}
-
-        employee = authentication.get('sub')
-        if employee in document.get('employee', []):
-            return render_template('company.html', company=document, authentication=authentication, isCreate=isCreate)
-        return render_template('company.html', company={}, authentication=authentication, isCreate=isCreate)
