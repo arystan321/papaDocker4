@@ -24,6 +24,9 @@ class DatabaseController(Singleton):
     def createFact(title: str, context: str, page: int, quote: str, source_id: str, authentication: dict = None):
         user_id = authentication.get('sub')
 
+        from run import csrf  # Import here to avoid circular import
+        csrf.protect()
+
         if any(len(s) > 512 for s in [title, context, source_id]):
             return {'error': 'Some field is too long!'}, 422
         if len(quote) > 1024:
@@ -59,6 +62,9 @@ class DatabaseController(Singleton):
     @Authenticated(required_roles=[AUTHENTICATED_ROLE])
     @RequiredParams()
     def deleteFact(fact_id: str, authentication: dict = None):
+        from run import csrf  # Import here to avoid circular import
+        csrf.protect()
+
         user_id = authentication.get('sub', None)
         fact = DatabaseController.service.get_document('facts', {'_id': fact_id})
         if user_id and fact and user_id == fact.get('user_id', None):
@@ -72,6 +78,9 @@ class DatabaseController(Singleton):
     @Authenticated(required_roles=[AUTHENTICATED_ROLE])
     @RequiredParams()
     def createSource(title: str, author: str, year: int, _type_id: str, link: str, authentication: dict = None):
+        from run import csrf  # Import here to avoid circular import
+        csrf.protect()
+
         user_id = authentication.get('sub')
 
         if any(len(s) > 512 for s in [title, author, _type_id, link]):
@@ -96,6 +105,9 @@ class DatabaseController(Singleton):
     @Authenticated(required_roles=[AUTHENTICATED_ROLE])
     @RequiredParams()
     def react(authentication: dict = None):
+        from run import csrf  # Import here to avoid circular import
+        csrf.protect()
+
         data = request.get_json()
         if not data:
             return jsonify({"error": "Invalid JSON data"}), 400
