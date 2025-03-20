@@ -54,6 +54,9 @@ class AuthenticationController(Singleton):
         response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite='Lax')
 
         authentication = AuthenticationController.service.get_roles(token)
+        if not authentication.get('active', True):
+            return response
+
         facts, labels, prefer_type = AuthenticationController.get_user_summary(authentication.get('sub'))
         response.set_cookie('primary_color', prefer_type.get('color', '#000000'), httponly=True, secure=True, samesite='Lax')
         response.set_cookie('username', authentication.get('username'), httponly=True, secure=True, samesite='Lax')
