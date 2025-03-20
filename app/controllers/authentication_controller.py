@@ -54,6 +54,9 @@ class AuthenticationController(Singleton):
         response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite='Lax')
 
         authentication = AuthenticationController.service.get_roles(token)
+        if not authentication.get('active', True):
+            return response
+
         facts, labels, prefer_type = AuthenticationController.get_user_summary(authentication.get('sub'))
         response.set_cookie('primary_color', prefer_type.get('color', '#000000'), httponly=True, secure=True, samesite='Lax')
         response.set_cookie('username', authentication.get('username'), httponly=True, secure=True, samesite='Lax')
@@ -76,7 +79,14 @@ class AuthenticationController(Singleton):
         if referrer.endswith("/profile"):
             referrer = f"{referrer}/{authentication.get('username', '')}"
 
-        response = make_response(redirect(referrer))
+        allowed_hosts = [os.getenv('HOST')]
+        if referrer and any(
+                referrer.startswith(f"{host}") for host in
+                allowed_hosts):
+            response = make_response(redirect(referrer))
+        else:
+            response = make_response(redirect(url_for('web.home')))
+
         response.set_cookie('access_token', '', expires=0, httponly=True, secure=True, samesite='Lax')
         response.set_cookie('primary_color', '', expires=0, httponly=True, secure=True, samesite='Lax')
         response.set_cookie('username', '', expires=0, httponly=True, secure=True, samesite='Lax')

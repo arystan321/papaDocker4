@@ -24,6 +24,9 @@ class DatabaseController(Singleton):
     def createFact(title: str, context: str, page: int, quote: str, source_id: str, authentication: dict = None):
         user_id = authentication.get('sub')
 
+        from run import csrf  # Import here to avoid circular import
+        csrf.protect()
+
         if any(len(s) > 512 for s in [title, context, source_id]):
             return {'error': 'Some field is too long!'}, 422
         if len(quote) > 1024:
@@ -59,11 +62,20 @@ class DatabaseController(Singleton):
     @Authenticated(required_roles=[AUTHENTICATED_ROLE])
     @RequiredParams()
     def deleteFact(fact_id: str, authentication: dict = None):
+        from run import csrf  # Import here to avoid circular import
+        csrf.protect()
+
         user_id = authentication.get('sub', None)
         fact = DatabaseController.service.get_document('facts', {'_id': fact_id})
         if user_id and fact and user_id == fact.get('user_id', None):
             DatabaseController.service.delete_document('facts', {'_id': fact.get('_id', None)})
-            return redirect(request.referrer)
+            referrer = request.referrer
+            allowed_hosts = [os.getenv('HOST')]
+            if referrer and any(
+                    referrer.startswith(f"{host}") for host in
+                    allowed_hosts):
+                return redirect(referrer)
+            return redirect(url_for('web.home'))
         else:
             return {'error': 'Wrong data'}, 422
 
@@ -72,6 +84,9 @@ class DatabaseController(Singleton):
     @Authenticated(required_roles=[AUTHENTICATED_ROLE])
     @RequiredParams()
     def createSource(title: str, author: str, year: int, _type_id: str, link: str, authentication: dict = None):
+        from run import csrf  # Import here to avoid circular import
+        csrf.protect()
+
         user_id = authentication.get('sub')
 
         if any(len(s) > 512 for s in [title, author, _type_id, link]):
@@ -96,6 +111,9 @@ class DatabaseController(Singleton):
     @Authenticated(required_roles=[AUTHENTICATED_ROLE])
     @RequiredParams()
     def react(authentication: dict = None):
+        from run import csrf  # Import here to avoid circular import
+        csrf.protect()
+
         data = request.get_json()
         if not data:
             return jsonify({"error": "Invalid JSON data"}), 400
@@ -109,17 +127,3 @@ class DatabaseController(Singleton):
         user_id = authentication.get('sub')
 
         return {"response": DatabaseController.service.react(_id, _collection, _label, user_id)}
-
-    @staticmethod
-    @blueprint.route('/facts/create', methods=['POST'])
-    @Authenticated(required_roles=[AUTHENTICATED_ROLE])
-    @RequiredParams()
-    def getProfileFacts(company_name: str = 'default', isCreate: bool = False, authentication: dict = None):
-        document = DatabaseController.service.get_document('companies', {
-            'name': company_name
-        }) or {}
-
-        employee = authentication.get('sub')
-        if employee in document.get('employee', []):
-            return render_template('company.html', company=document, authentication=authentication, isCreate=isCreate)
-        return render_template('company.html', company={}, authentication=authentication, isCreate=isCreate)
