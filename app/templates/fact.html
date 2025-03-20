@@ -130,6 +130,10 @@
 
         fetch("{{ url_for('database.deleteFact') }}", {
             method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token() }}"  // Add CSRF token in headers
+            },
             body: formData
         }).then(data => {
               window.location.reload(); // Reloads the current page
