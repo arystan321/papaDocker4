@@ -1,3 +1,4 @@
+import os
 import urllib
 
 from flask import session, redirect, url_for, request, make_response
@@ -124,7 +125,14 @@ class PatreonService(IDonationService, IAuthenticationRoute):
     def logout(self):
         session.pop('patreon_token', None)
         session.pop('patron_profile', None)
-        return redirect(request.referrer)
+        referrer = request.referrer
+
+        allowed_hosts = [os.getenv('HOST')]
+        if referrer and any(
+                referrer.startswith(f"{host}") for host in
+                allowed_hosts):
+            return redirect(referrer)
+        return redirect(url_for('web.home'))
 
     def callback(self):
         code = request.args.get('code')

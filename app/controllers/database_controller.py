@@ -69,7 +69,13 @@ class DatabaseController(Singleton):
         fact = DatabaseController.service.get_document('facts', {'_id': fact_id})
         if user_id and fact and user_id == fact.get('user_id', None):
             DatabaseController.service.delete_document('facts', {'_id': fact.get('_id', None)})
-            return redirect(request.referrer)
+            referrer = request.referrer
+            allowed_hosts = [os.getenv('HOST')]
+            if referrer and any(
+                    referrer.startswith(f"{host}") for host in
+                    allowed_hosts):
+                return redirect(referrer)
+            return redirect(url_for('web.home'))
         else:
             return {'error': 'Wrong data'}, 422
 

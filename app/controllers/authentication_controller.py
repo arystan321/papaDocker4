@@ -79,7 +79,14 @@ class AuthenticationController(Singleton):
         if referrer.endswith("/profile"):
             referrer = f"{referrer}/{authentication.get('username', '')}"
 
-        response = make_response(redirect(referrer))
+        allowed_hosts = [os.getenv('HOST')]
+        if referrer and any(
+                referrer.startswith(f"{host}") for host in
+                allowed_hosts):
+            response = make_response(redirect(referrer))
+        else:
+            response = make_response(redirect(url_for('web.home')))
+
         response.set_cookie('access_token', '', expires=0, httponly=True, secure=True, samesite='Lax')
         response.set_cookie('primary_color', '', expires=0, httponly=True, secure=True, samesite='Lax')
         response.set_cookie('username', '', expires=0, httponly=True, secure=True, samesite='Lax')
