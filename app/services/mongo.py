@@ -1,20 +1,78 @@
+import re
 from datetime import datetime
 from typing import Tuple, Dict
 
-from bson import ObjectId
+from bson import ObjectId, SON
 from pymongo import MongoClient, ReturnDocument, DESCENDING, ASCENDING
 
 from app.services.interfaces.idatabase_service import DatabaseService
 
 
 class Mongo(DatabaseService):
+    @staticmethod
+    def sanitize_label(value: str) -> str:
+        """Sanitizes user input by escaping special characters used in NoSQL injections."""
+        if not isinstance(value, str):
+            raise ValueError("Invalid input: must be a string")
+        return re.sub(r"([\$\.\{\}\[\]\(\)])", r"\\\1", value)  # Escaping special characters
+
+    def sanitize_query(self, query: dict) -> dict:
+        """Sanitizes MongoDB queries while preserving aggregation operators."""
+        if not isinstance(query, dict):
+            raise ValueError("Invalid query: must be a dictionary")
+
+        sanitized_query = {}
+        for key, value in query.items():
+            if not isinstance(key, str):
+                continue  # Ignore non-string keys
+
+            # ✅ Preserve MongoDB operators ($match, $sort, etc.)
+            if key.startswith("$"):
+                sanitized_query[key] = value
+            else:
+                sanitized_key = re.sub(r"[\$\.\{\}\[\]\(\)]", "", key)  # Remove special characters
+                sanitized_value = self.sanitize_value(value)
+                sanitized_query[sanitized_key] = sanitized_value
+
+        return sanitized_query
+
+    def sanitize_value(self, value):
+        """Sanitizes individual values within a query."""
+        if isinstance(value, str):
+            return re.sub(r"[\$\.\{\}\[\]\(\)]", "", value)  # Remove special characters
+        elif isinstance(value, dict):
+            return self.sanitize_query(value)  # Recursively sanitize nested queries
+        elif isinstance(value, list):
+            return [self.sanitize_value(item) for item in value]  # Sanitize lists
+        return value  # Return unchanged for numbers, booleans, etc.
+
+    def sanitize_pipeline(self, pipeline: list) -> list:
+        """Sanitizes aggregation pipelines while preserving MongoDB operators."""
+        if not isinstance(pipeline, list):
+            raise ValueError("Invalid pipeline: must be a list")
+
+        sanitized_pipeline = []
+        for stage in pipeline:
+            if not isinstance(stage, dict):
+                continue  # Ignore invalid pipeline stages
+
+            sanitized_stage = {}
+            for key, value in stage.items():
+                if key.startswith("$"):  # ✅ Preserve MongoDB operators
+                    sanitized_stage[key] = self.sanitize_value(value)
+                else:
+                    sanitized_stage[self.sanitize_query({key: value})] = value
+
+            sanitized_pipeline.append(sanitized_stage)
+
+        return sanitized_pipeline
 
     def react(self, _id: str, _collection: str, _label: str, user_id: str) -> tuple[dict[str, str], int]:
         collection = self.db[_collection]
         reactions_collection = self.db['labels']
         document = collection.find_one({"_id": ObjectId(_id)})
 
-        label_exists = reactions_collection.find_one({"name": _label})
+        label_exists = reactions_collection.find_one(SON({"name": self.sanitize_label(_label)}))
         if not label_exists:
             return {"error": f"Label '{_label}' does not exist in labels collection"}, 400
 
@@ -29,20 +87,20 @@ class Mongo(DatabaseService):
                     # Append user to the label's user list
                     collection.update_one(
                         {"_id": ObjectId(_id), "labels.label_id": ObjectId(label_exists.get('_id'))},
-                        {"$addToSet": {"labels.$.users": user_id}}
+                        {"$addToSet": SON({"labels.$.users": self.sanitize_label(user_id)})}
                     )
                     return {"message": f"User {user_id} reacted with {_label}"}, 200
                 else:
                     collection.update_one(
                         {"_id": ObjectId(_id), "labels.label_id": ObjectId(label_exists.get('_id'))},
-                        {"$pull": {"labels.$.users": user_id}}
+                        {"$pull": SON({"labels.$.users": self.sanitize_label(user_id)})}
                     )
                     return {"message": f"User {user_id} dereacted with {_label}"}, 200
 
         # If label does not exist in document, add it
         collection.update_one(
             {"_id": ObjectId(_id)},
-            {"$push": {"labels": {"label_id": ObjectId(label_exists.get('_id')), "users": [user_id]}}}
+            {"$push": {"labels": SON({"label_id": ObjectId(label_exists.get('_id')), "users": [self.sanitize_label(user_id)]})}}
         )
 
         return {"message": f"User {user_id} reacted with created {_label}"}, 200
@@ -54,17 +112,17 @@ class Mongo(DatabaseService):
             return {"error": "User is missing"}
 
         collection = self.db['facts']
-        query = {'title': title}
-        document = {
-            'title': title,
-            'context': context,
-            'page': page,
-            'quote': quote,
+        query = SON({'title': title})
+        document = SON({
+            'title': self.sanitize_label(title),
+            'context': self.sanitize_label(context),
+            'page': int(page),
+            'quote': self.sanitize_label(quote),
             'source_id': ObjectId(source_id),
-            'user_id': user_id,
+            'user_id': self.sanitize_label(user_id),
             'labels': [],
             'created_at': datetime.utcnow(),
-        }
+        })
         return dict(collection.find_one_and_update(query, {"$set": document}, upsert=True, return_document=ReturnDocument.AFTER))
 
     def create_source(self, title: str, author: str, year: int, _type_id: str, link: str) -> dict:
@@ -73,16 +131,16 @@ class Mongo(DatabaseService):
             return {"error": f"Label '{_type_id}' does not exist in labels collection"}
 
         collection = self.db['sources']
-        query = {'title': title}
-        document = {
-            'title': title,
-            'author': author,
-            'year': year,
+        query = {'title': self.sanitize_label(title)}
+        document = SON({
+            'title': self.sanitize_label(title),
+            'author': self.sanitize_label(author),
+            'year': int(year),
             'type': ObjectId(_type_id),
-            'link': link,
+            'link': self.sanitize_label(link),
             'labels': [],
             'created_at': datetime.utcnow(),
-        }
+        })
         return dict(collection.find_one_and_update(query, {"$set": document}, upsert=True,
                                                    return_document=ReturnDocument.AFTER))
 
@@ -92,7 +150,7 @@ class Mongo(DatabaseService):
 
     def get_documents(self, collection: str, query: dict) -> list[dict]:
         collection = self.db[collection]
-        return list(collection.find(query))
+        return list(collection.find(self.sanitize_query(query)))
 
     def get_documents_pipeline(self, collection: str, pipeline: list) -> list[dict]:
         for stage in pipeline:
@@ -103,7 +161,7 @@ class Mongo(DatabaseService):
                 break
 
         collection = self.db[collection]
-        return list(collection.aggregate(pipeline))
+        return list(collection.aggregate(self.sanitize_pipeline(pipeline)))
 
     def get_document(self, collection: str, query: dict) -> dict:
         for key in query:
@@ -113,7 +171,7 @@ class Mongo(DatabaseService):
                 except Exception:
                     pass
         collection = self.db[collection]
-        return collection.find_one(query)
+        return collection.find_one(self.sanitize_query(query))
 
     def delete_document(self, collection: str, query: dict):
         for key in query:
@@ -122,15 +180,20 @@ class Mongo(DatabaseService):
                     query[key] = ObjectId(query[key])  # Convert to ObjectId
                 except Exception:
                     pass
-        self.db[collection].delete_one(query)
+        self.db[collection].delete_one(self.sanitize_query(query))
 
     def count_documents(self, collection: str, query: dict) -> int:
         collection = self.db[collection]
-        return collection.count_documents(query)
+        return collection.count_documents(self.sanitize_query(query))
 
     def get_user_summary(self, user_id: str):
+        """Retrieves user summary safely."""
+
+        if not isinstance(user_id, str):
+            user_id = '^$'
+
         pipeline = [
-            {"$match": {"user_id": user_id}},  # Filter documents by user_id
+            {"$match": {"user_id": self.sanitize_label(user_id)}},  # Filter documents by user_id
             {"$unwind": "$labels"},  # Flatten the labels array
             {
                 "$group": {
@@ -150,7 +213,7 @@ class Mongo(DatabaseService):
             label.update({'reaction_count': label_source.get('reaction_count') if label_source else 0})
 
         pipeline = [
-            {"$match": {"user_id": {"$exists": True, "$eq": user_id}}},  # Filter where user_id matches
+            {"$match": {"user_id": {"$exists": True, "$eq": self.sanitize_label(user_id)}}},  # Filter where user_id matches
             {
                 "$project": {
                     "_id": 1,  # Include document ID
