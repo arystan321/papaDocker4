@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+  frontend:
+    image: my_frontend_image
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.hostname == master]
+    networks:
+      - webnet
+
+  backend:
+    image: my_backend_image
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.hostname == worker1]
+    networks:
+      - webnet
+
+  nginx:
+    image: nginx:latest
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.hostname == worker2]
+    networks:
+      - webnet
+    ports:
+      - "80:80"
+
+networks:
+  webnet:
+    driver: overlay
