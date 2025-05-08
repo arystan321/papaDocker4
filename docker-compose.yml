@@ -2,33 +2,42 @@ version: '3.7'
 
 services:
   frontend:
-    image: nginx:latest  # You can use any official image or a simple image for your frontend
+    build:
+      context: ./frontend
     deploy:
       replicas: 1
       placement:
-        constraints: [node.hostname == master]
+        constraints:
+          - node.role == worker
+          - node.hostname == worker1
     networks:
       - webnet
 
   backend:
-    image: node:latest  # Use an official image like 'node' or any other for backend
+    build:
+      context: ./backend
     deploy:
       replicas: 1
       placement:
-        constraints: [node.hostname == worker1]
+        constraints:
+          - node.role == worker
+          - node.hostname == worker2
     networks:
       - webnet
 
   nginx:
-    image: nginx:latest
+    build:
+      context: ./nginx
     deploy:
       replicas: 1
       placement:
-        constraints: [node.hostname == worker2]
+        constraints:
+          - node.role == manager
+          - node.hostname == master
     networks:
       - webnet
     ports:
-      - "8080:80"
+      - "8081:80"
 
 networks:
   webnet:
