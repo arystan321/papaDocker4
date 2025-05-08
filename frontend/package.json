@@ -1,0 +1,9 @@
+{
+    "name": "frontend",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+      "start": "echo \"Replace this with a real start command\" && exit 1"
+    }
+  }
+  
