@@ -1,0 +1,22 @@
+# Use a Python base image
+FROM python:3.9-slim
+
+# Set environment variables for Flask app
+ENV FLASK_APP=run.py
+ENV FLASK_ENV=production
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the backend code into the container
+COPY . /app
+
+# Install dependencies
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
+
+# Expose the port the app runs on
+EXPOSE 5000
+
+# Run the Flask app
+CMD ["python", "run.py"]
