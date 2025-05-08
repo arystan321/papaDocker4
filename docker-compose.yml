@@ -14,7 +14,7 @@ services:
     networks:
       - webnet
     ports:
-      - "80:80" # Expose port 80 for frontend
+      - "8081:80" # Expose port 80 for frontend
 
   backend:
     build:
@@ -29,7 +29,7 @@ services:
     networks:
       - webnet
     ports:
-      - "5000:5000" # Expose port 5000 for backend
+      - "5001:5000" # Expose port 5000 for backend
 
   nginx:
     image: nginx:latest
