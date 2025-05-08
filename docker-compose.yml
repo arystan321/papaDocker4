@@ -10,7 +10,8 @@ services:
       placement:
         constraints:
           - node.role == worker
-          - node.hostname == worker1
+          - node.address == 192.168.1.10
+  
     networks:
       - webnet
 
@@ -23,7 +24,7 @@ services:
       placement:
         constraints:
           - node.role == worker
-          - node.hostname == worker2
+          - node.address == 24.199.121.144
     networks:
       - webnet
 
