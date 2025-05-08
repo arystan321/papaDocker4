@@ -31,7 +31,7 @@ def create_app():
                                                 os.getenv('REALM'),
                                                 os.getenv('CLIENT_ID'),
                                                 os.getenv('CLIENT_SECRET'),
-                                                quote(os.getenv('HOST_CALLBACK'), safe=''),
+                                                quote(os.getenv('HOST_CALLBACK') or '', safe=''),
                                                 os.getenv('KEYCLOAK_ADMIN_SECRET'))
     app.register_blueprint(AuthenticationController.blueprint)
 
