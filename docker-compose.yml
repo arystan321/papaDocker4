@@ -3,7 +3,7 @@ version: '3.7'
 services:
   frontend:
     build:
-      context: ./frontend
+      dockerfile: Dockerfile-frontend
     deploy:
       replicas: 1
       placement:
@@ -15,7 +15,7 @@ services:
 
   backend:
     build:
-      context: ./backend
+      dockerfile: Dockerfile-backend
     deploy:
       replicas: 1
       placement:
