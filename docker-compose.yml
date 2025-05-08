@@ -28,7 +28,7 @@ services:
     networks:
       - webnet
     ports:
-      - "80:80"
+      - "8080:80"
 
 networks:
   webnet:
