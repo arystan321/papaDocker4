@@ -14,7 +14,7 @@ services:
     networks:
       - webnet
     ports:
-      - "3000:3000"  # Exposes frontend on port 3000
+      - "80:80" # Expose port 80 for frontend
 
   backend:
     build:
@@ -29,19 +29,18 @@ services:
     networks:
       - webnet
     ports:
-      - "5000:5000"  # Exposes backend on port 5000
+      - "5000:5000" # Expose port 5000 for backend
 
   nginx:
     image: nginx:latest
     deploy:
       replicas: 1
       placement:
-        constraints:
-          - node.hostname == worker2
+        constraints: [node.hostname == worker2]
     networks:
       - webnet
     ports:
-      - "8080:80"  # Exposes Nginx on port 8080
+      - "8080:80" # Expose port 80 on nginx to 8080 on host
 
 networks:
   webnet:
