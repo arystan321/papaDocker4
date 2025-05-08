@@ -1,11 +1,3 @@
-# Use Nginx for serving static files
 FROM nginx:alpine
-
-# Copy the built React app into the Nginx container
-COPY build/ /usr/share/nginx/html
-
-# Expose the port
+COPY index.html /usr/share/nginx/html/index.html
 EXPOSE 80
-
-# Start Nginx server
-CMD ["nginx", "-g", "daemon off;"]
