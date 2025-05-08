@@ -11,9 +11,10 @@ services:
         constraints:
           - node.role == worker
           - node.address == 192.168.1.10
-  
     networks:
       - webnet
+    ports:
+      - "3000:3000"  # Exposes frontend on port 3000
 
   backend:
     build:
@@ -27,19 +28,21 @@ services:
           - node.address == 24.199.121.144
     networks:
       - webnet
+    ports:
+      - "5000:5000"  # Exposes backend on port 5000
 
   nginx:
     image: nginx:latest
     deploy:
       replicas: 1
       placement:
-        constraints: [node.hostname == worker2]
+        constraints:
+          - node.hostname == worker2
     networks:
       - webnet
     ports:
-      - "8080:80"
+      - "8080:80"  # Exposes Nginx on port 8080
 
 networks:
   webnet:
     driver: overlay
-
