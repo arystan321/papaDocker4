@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   frontend:
-    image: my_frontend_image
+    image: nginx:latest  # You can use any official image or a simple image for your frontend
     deploy:
       replicas: 1
       placement:
@@ -11,7 +11,7 @@ services:
       - webnet
 
   backend:
-    image: my_backend_image
+    image: node:latest  # Use an official image like 'node' or any other for backend
     deploy:
       replicas: 1
       placement:
